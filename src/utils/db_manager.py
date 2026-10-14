@@ -1,0 +1,30 @@
+from src.repositories.bookings import BookingsRepository
+from src.repositories.facilities import FacilitiesRepository, RoomsFacilitiesRepository
+from src.repositories.hotels import HotelsRepository
+from src.repositories.rooms import RoomsRepository
+from src.repositories.users import UsersRepository
+
+
+class DBManager:
+
+    def __init__(self, session_factory) -> None:
+        self.session_factory = session_factory
+
+    async def __aenter__(self) -> "DBManager":
+        self.session = self.session_factory()
+
+        self.hotels = HotelsRepository(self.session)
+        self.users = UsersRepository(self.session)
+        self.rooms = RoomsRepository(self.session)
+        self.bookings = BookingsRepository(self.session)
+        self.facilities = FacilitiesRepository(self.session)
+        self.rooms_facilities = RoomsFacilitiesRepository(self.session)
+
+        return self
+
+    async def __aexit__(self, *args) -> None:
+        await self.session.rollback()
+        await self.session.close()
+
+    async def commit(self) -> None:
+        await self.session.commit()
