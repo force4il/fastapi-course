@@ -30,3 +30,10 @@ async def add_facility(
     test_task.delay()
 
     return {"status": "OK", "data": facility}
+
+
+@router.delete("/{facility_id}", summary="Удаление удобства")
+async def delete_facility(facility_id: int, db: DBDep) -> dict:
+    await db.facilities.delete(id=facility_id)
+    await db.commit()
+    return {"status": "OK"}

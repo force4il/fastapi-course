@@ -3,7 +3,7 @@ from src.models.facilities import FacilitiesOrm
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
 from src.models.users import UsersOrm
-from src.repositories.mappers.base import DataMapper
+from tasks.repositories.mappers.base import DataMapper
 from src.schemas.bookings import Booking
 from src.schemas.facilities import Facility
 from src.schemas.hotels import Hotel

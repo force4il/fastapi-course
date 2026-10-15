@@ -4,9 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from src.models.rooms import RoomsOrm
-from src.repositories.base import BaseRepository
-from src.repositories.mappers.mappers import RoomDataMapper, RoomWithRelsDataMapper
-from src.repositories.utils import rooms_ids_for_booking
+from tasks.repositories.base import BaseRepository
+from tasks.repositories.mappers.mappers import RoomDataMapper, RoomWithRelsDataMapper
+from tasks.repositories.utils import rooms_ids_for_booking
 
 
 class RoomsRepository(BaseRepository):
