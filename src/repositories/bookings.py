@@ -1,6 +1,6 @@
 from src.models.bookings import BookingsOrm
-from tasks.repositories.base import BaseRepository
-from tasks.repositories.mappers.mappers import BookingDataMapper
+from repositories.base import BaseRepository
+from repositories.mappers.mappers import BookingDataMapper
 
 
 class BookingsRepository(BaseRepository):

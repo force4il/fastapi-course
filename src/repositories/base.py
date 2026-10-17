@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import insert, select, update
 
-from tasks.repositories.mappers.base import DataMapper
+from repositories.mappers.base import DataMapper
 
 
 class BaseRepository:

@@ -4,9 +4,9 @@ from sqlalchemy import select
 
 from src.models.hotels import HotelsOrm
 from src.models.rooms import RoomsOrm
-from tasks.repositories.base import BaseRepository
-from tasks.repositories.mappers.mappers import HotelDataMapper
-from tasks.repositories.utils import rooms_ids_for_booking
+from repositories.base import BaseRepository
+from repositories.mappers.mappers import HotelDataMapper
+from repositories.utils import rooms_ids_for_booking
 from src.schemas.hotels import Hotel
 
 

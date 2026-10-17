@@ -1,8 +1,8 @@
-from tasks.repositories.bookings import BookingsRepository
-from tasks.repositories.facilities import FacilitiesRepository, RoomsFacilitiesRepository
-from tasks.repositories.hotels import HotelsRepository
-from tasks.repositories.rooms import RoomsRepository
-from tasks.repositories.users import UsersRepository
+from repositories.bookings import BookingsRepository
+from repositories.facilities import FacilitiesRepository, RoomsFacilitiesRepository
+from repositories.hotels import HotelsRepository
+from repositories.rooms import RoomsRepository
+from repositories.users import UsersRepository
 
 
 class DBManager:
