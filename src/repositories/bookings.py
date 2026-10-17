@@ -1,8 +1,21 @@
+from datetime import date
+
+from sqlalchemy import select
+
 from src.models.bookings import BookingsOrm
-from repositories.base import BaseRepository
-from repositories.mappers.mappers import BookingDataMapper
+from src.repositories.base import BaseRepository
+from src.repositories.mappers.mappers import BookingDataMapper
 
 
 class BookingsRepository(BaseRepository):
     model = BookingsOrm
     mapper = BookingDataMapper
+
+    async def get_bookings_checkin_today(self):
+        query = (
+            select(BookingsOrm)
+            .filter(BookingsOrm.date_from == date.today())
+        )
+
+        result = self.session.execute(query)
+        return [self.mapper.map_to_domain_entity(booking) for booking in result.scalars().all()]

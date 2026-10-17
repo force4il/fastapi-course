@@ -1,10 +1,11 @@
 from time import sleep
 from PIL import Image
 from pathlib import Path
-
+import asyncio
 
 from src.tasks.celery_app import celery_instance
-
+from src.api.dependecies import DBManager
+from src.database import async_session_maker
 
 @celery_instance.task
 def test_task():
@@ -27,3 +28,13 @@ def resize_image(image_path: str):
         output_path = Path(output_folder) / new_filename
 
         img_resized.save(output_path.absolute())
+
+
+async def get_bookings_with_today_checkin():
+    async with DBManager(async_session_maker) as db:
+        bookings = await db.bookings.get_bookings_checkin_today()
+
+
+@celery_instance.task(name="booking_today_checkin")
+def send_emails_to_users_checkin():
+    asyncio.run(get_bookings_with_today_checkin())
