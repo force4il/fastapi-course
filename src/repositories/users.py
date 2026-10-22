@@ -3,7 +3,7 @@ from sqlalchemy import select
 
 from src.models.users import UsersOrm
 from src.repositories.base import BaseRepository
-from src.repositories.mappers.mappers import UserDataMapper
+from src.repositories.mappers.mappers import UserDataMapper, UserWithHashPassDataMapper
 from src.schemas.users import UserWithHashPass
 
 
@@ -16,4 +16,4 @@ class UsersRepository(BaseRepository):
         result = await self.session.execute(query)
         user = result.scalars().one()
 
-        return self.mapper.map_to_domain_entity(user)
+        return UserWithHashPassDataMapper.map_to_domain_entity(user)

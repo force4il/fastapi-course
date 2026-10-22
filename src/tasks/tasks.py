@@ -1,11 +1,13 @@
-from time import sleep
-from PIL import Image
-from pathlib import Path
 import asyncio
+from pathlib import Path
+from time import sleep
 
-from src.tasks.celery_app import celery_instance
+from PIL import Image
+
 from src.api.dependecies import DBManager
-from src.database import async_session_maker
+from src.database import async_session_maker_null_pool
+from src.tasks.celery_app import celery_instance
+
 
 @celery_instance.task
 def test_task():
@@ -13,7 +15,7 @@ def test_task():
     print("Its done")
 
 
-@celery_instance.task
+# @celery_instance.task
 def resize_image(image_path: str):
     sizes = [i for i in range(1000, 10000, 1000)]
     output_folder = "src/static/images/"
@@ -23,7 +25,9 @@ def resize_image(image_path: str):
     ext = Path(image_path).suffix
 
     for size in sizes:
-        img_resized = img.resize((size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS)
+        img_resized = img.resize(
+            (size, int(img.height * (size / img.width))), Image.Resampling.LANCZOS
+        )
         new_filename = f"{filename}_{size}px{ext}"
         output_path = Path(output_folder) / new_filename
 
@@ -31,8 +35,9 @@ def resize_image(image_path: str):
 
 
 async def get_bookings_with_today_checkin():
-    async with DBManager(async_session_maker) as db:
+    async with DBManager(async_session_maker_null_pool) as db:
         bookings = await db.bookings.get_bookings_checkin_today()
+    print(bookings)
 
 
 @celery_instance.task(name="booking_today_checkin")

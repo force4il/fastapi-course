@@ -8,7 +8,7 @@ from src.schemas.bookings import Booking
 from src.schemas.facilities import Facility
 from src.schemas.hotels import Hotel
 from src.schemas.rooms import Room, RoomWithRels
-from src.schemas.users import User
+from src.schemas.users import User, UserWithHashPass
 
 
 class HotelDataMapper(DataMapper):
@@ -29,6 +29,11 @@ class RoomWithRelsDataMapper(DataMapper):
 class UserDataMapper(DataMapper):
     db_model = UsersOrm
     schema = User
+
+
+class UserWithHashPassDataMapper(DataMapper):
+    db_model = UsersOrm
+    schema = UserWithHashPass
 
 
 class BookingDataMapper(DataMapper):

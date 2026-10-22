@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, HTTPException, Response
 from sqlalchemy.exc import IntegrityError
 
 from src.api.dependecies import DBDep, UserIdDep
-from src.schemas.users import UserAdd, UserRequestAdd
+from src.schemas.users import UserAdd, UserRequestAdd, UserWithHashPass
 from src.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Авторизация и аутенфикация"])
@@ -35,7 +35,7 @@ async def login_user(
         }
     ),
 ) -> dict:
-    user = await db.users.get_user_with_hashed_pass(email=data.email)
+    user: UserWithHashPass = await db.users.get_user_with_hashed_pass(email=data.email)
     if user is None:
         raise HTTPException(
             status_code=401, detail="Пользователь с таким email не зарегестрирован"
