@@ -47,8 +47,6 @@ class BaseRepository:
     async def edit(
         self, data: BaseModel, exclude_unset: bool = False, **filter_by: dict
     ) -> None:
-        await self.check_one_item(**filter_by)
-
         stmt = (
             update(self.model)
             .filter_by(**filter_by)
@@ -57,17 +55,5 @@ class BaseRepository:
         await self.session.execute(stmt)
 
     async def delete(self, **filter_by: dict) -> None:
-        await self.check_one_item(**filter_by)
-
         stmt = sqlalchemy.delete(self.model).filter_by(**filter_by)
         await self.session.execute(stmt)
-
-    async def check_one_item(self, **filter_by: dict) -> None:
-        try:
-            result = await self.get_one_or_none(**filter_by)
-            if result is None:
-                raise HTTPException(404, detail="Удаляемый объект не найден")
-        except sqlalchemy.orm.exc.MultipleResultsFound:
-            raise HTTPException(
-                400, detail="По заданному фильтру найдено больше 1 объекта"
-            )

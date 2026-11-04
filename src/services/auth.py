@@ -36,3 +36,4 @@ class AuthService:
             )
         except jwt.exceptions.DecodeError:
             raise HTTPException(status_code=401, detail="Неверный токен")
+ 

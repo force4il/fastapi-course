@@ -94,7 +94,7 @@ async def register_user(
 
 
 @router.post("/logout", summary="Выход из системы")
-def logout_user(response: Response) -> dict:
+def logout_user(response: Response, user_id: UserIdDep) -> dict:
     response.delete_cookie("access_token")
     return {"status": "Успешный выход из системы"}
 
