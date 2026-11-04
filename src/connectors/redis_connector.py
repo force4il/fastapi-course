@@ -2,7 +2,6 @@ import redis.asyncio as redis
 
 
 class RedisManager:
-
     def __init__(self, host: str, port: int) -> None:
         self.host = host
         self.port = port
@@ -11,7 +10,7 @@ class RedisManager:
     async def connect(self) -> None:
         self.redis = await redis.Redis(host=self.host, port=self.port)
 
-    async def set(self, key: str, value: str, expire: int = None) -> None:
+    async def set(self, key: str, value: str, expire: int | None = None) -> None:
         if expire:
             await self.redis.set(key, value, ex=expire)
         else:

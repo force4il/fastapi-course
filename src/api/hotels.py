@@ -72,12 +72,8 @@ async def put_hotel(db: DBDep, hotel_id: PaginationId, hotel_data: HotelAdd) -> 
     return {"status": "OK"}
 
 
-@router.patch(
-    "/{hotel_id}", summary="Частичное обновление данных (или также полное) об отеле"
-)
-async def patch_hotel(
-    db: DBDep, hotel_id: PaginationId, hotel_data: HotelPatch
-) -> dict:
+@router.patch("/{hotel_id}", summary="Частичное обновление данных (или также полное) об отеле")
+async def patch_hotel(db: DBDep, hotel_id: PaginationId, hotel_data: HotelPatch) -> dict:
     await db.hotels.edit(hotel_data, exclude_unset=True, id=hotel_id)
     await db.commit()
     return {"status": "OK"}

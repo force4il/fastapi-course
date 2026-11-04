@@ -28,9 +28,7 @@ class HotelsRepository(BaseRepository):
         if title:
             hotels_ids = hotels_ids.filter(HotelsOrm.title.ilike(f"%{title.strip()}%"))
         if location:
-            hotels_ids = hotels_ids.filter(
-                HotelsOrm.location.ilike(f"%{location.strip()}%")
-            )
+            hotels_ids = hotels_ids.filter(HotelsOrm.location.ilike(f"%{location.strip()}%"))
 
         hotels_ids = hotels_ids.limit(limit).offset(offset)
 

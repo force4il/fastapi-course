@@ -1,7 +1,7 @@
 from datetime import date
 
-from sqlalchemy import select, delete
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from repositories.utils import rooms_ids_for_booking
 from src.models.bookings import BookingsOrm
@@ -18,16 +18,11 @@ class BookingsRepository(BaseRepository):
         query = select(self.model).filter(self.model.date_from == date.today())
 
         result = await self.session.execute(query)
-        return [
-            self.mapper.map_to_domain_entity(booking)
-            for booking in result.scalars().all()
-        ]
+        return [self.mapper.map_to_domain_entity(booking) for booking in result.scalars().all()]
 
     async def add_booking(self, data: BookingAdd, hotel_id: int):
         rooms_ids_to_get = rooms_ids_for_booking(
-            date_from=data.date_from, 
-            date_to=data.date_to, 
-            hotel_id=hotel_id
+            date_from=data.date_from, date_to=data.date_to, hotel_id=hotel_id
         )
         rooms_ids_to_book_res = await self.session.execute(rooms_ids_to_get)
         rooms_ids_to_book: list[int] = rooms_ids_to_book_res.scalars().all()
@@ -36,4 +31,3 @@ class BookingsRepository(BaseRepository):
             return await self.add(data)
 
         raise HTTPException(status_code=409, detail="Все данные номера уже забронировали")
-

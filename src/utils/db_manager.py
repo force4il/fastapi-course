@@ -1,3 +1,5 @@
+from typing import Self
+
 from src.repositories.bookings import BookingsRepository
 from src.repositories.facilities import FacilitiesRepository, RoomsFacilitiesRepository
 from src.repositories.hotels import HotelsRepository
@@ -6,11 +8,10 @@ from src.repositories.users import UsersRepository
 
 
 class DBManager:
-
     def __init__(self, session_factory) -> None:
         self.session_factory = session_factory
 
-    async def __aenter__(self) -> "DBManager":
+    async def __aenter__(self) -> Self:
         self.session = self.session_factory()
 
         self.hotels = HotelsRepository(self.session)

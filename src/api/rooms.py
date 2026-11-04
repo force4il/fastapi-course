@@ -88,20 +88,16 @@ async def part_edit_room(
 ) -> dict:
     room_patch_dict = room_data.model_dump(exclude_unset=True)
     room_patch_data = RoomPatch(hotel_id=hotel_id, **room_patch_dict)
-    await db.rooms.edit(
-        room_patch_data, exclude_unset=True, id=room_id, hotel_id=hotel_id
-    )
+    await db.rooms.edit(room_patch_data, exclude_unset=True, id=room_id, hotel_id=hotel_id)
     if "facilities_ids" in room_patch_dict:
-        await db.rooms_facilities.set_room_facility(
-            room_id, room_patch_dict["facilities_ids"]
-        )
+        await db.rooms_facilities.set_room_facility(room_id, room_patch_dict["facilities_ids"])
     await db.commit()
 
     return {"status": "OK"}
 
 
 @router.delete("/{hotel_id}/rooms/{room_id}", summary="Удаление номера отеля")
-async def get_room(db: DBDep, hotel_id: PaginationId, room_id: PaginationId) -> dict:
+async def delete_room(db: DBDep, hotel_id: PaginationId, room_id: PaginationId) -> dict:
     await db.rooms.delete(id=room_id, hotel_id=hotel_id)
     await db.commit()
     return {"status": "OK"}

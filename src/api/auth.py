@@ -37,9 +37,7 @@ async def login_user(
 ) -> dict:
     user: UserWithHashPass = await db.users.get_user_with_hashed_pass(email=data.email)
     if user is None:
-        raise HTTPException(
-            status_code=401, detail="Пользователь с таким email не зарегестрирован"
-        )
+        raise HTTPException(status_code=401, detail="Пользователь с таким email не зарегестрирован")
     if not AuthService().verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Неверный пароль")
 
@@ -86,9 +84,7 @@ async def register_user(
         await db.users.add(hashed_user_data)
         await db.commit()
     except IntegrityError:
-        raise HTTPException(
-            status_code=403, detail="Пользователь с такой почтой уже существует"
-        )
+        raise HTTPException(status_code=403, detail="Пользователь с такой почтой уже существует")
 
     return {"status": "OK"}
 

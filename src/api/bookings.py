@@ -19,17 +19,15 @@ async def get_my_bookings(db: DBDep, user_id: UserIdDep):
 @router.post("", summary="Добавление бронирования")
 async def add_booking(db: DBDep, booking_data: BookingRequest, user_id: UserIdDep):
     room = await db.rooms.get_one_or_none(id=booking_data.room_id)
-    booking_add_data = BookingAdd(
-        **booking_data.model_dump(), user_id=user_id, price=room.price
-    )
+    booking_add_data = BookingAdd(**booking_data.model_dump(), user_id=user_id, price=room.price)
 
     booking = await db.bookings.add_booking(booking_add_data, hotel_id=room.hotel_id)
-    await db.commit() 
+    await db.commit()
     return {"status": "OK", "data": booking}
 
 
 @router.delete("/{booking_id}", summary="Удаление бронирования")
-async def delete_booking(db:DBDep, booking_id: int) -> dict:
+async def delete_booking(db: DBDep, booking_id: int) -> dict:
     await db.bookings.delete(id=booking_id)
     await db.commit()
     return {"status": "OK"}

@@ -10,10 +10,11 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-# from fastapi_cache.backends.inmemory import InMemoryBackend
 
+# from fastapi_cache.backends.inmemory import InMemoryBackend
 from src.init import redis_manager
 from src.routers import main_router
+
 # from src.config import settings
 
 # from src.api.dependecies import get_db

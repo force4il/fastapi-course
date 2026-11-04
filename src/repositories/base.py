@@ -1,5 +1,4 @@
 import sqlalchemy
-from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import insert, select, update
 
@@ -17,9 +16,7 @@ class BaseRepository:
         query = select(self.model).filter(*filter).filter_by(**filter_by)
         result = await self.session.execute(query)
 
-        return [
-            self.mapper.map_to_domain_entity(model) for model in result.scalars().all()
-        ]
+        return [self.mapper.map_to_domain_entity(model) for model in result.scalars().all()]
 
     async def get_all(self, *args: tuple, **kwargs: dict) -> list:
         return await self.get_filtered()
@@ -44,9 +41,7 @@ class BaseRepository:
         stmt = insert(self.model).values([item.model_dump() for item in data])
         await self.session.execute(stmt)
 
-    async def edit(
-        self, data: BaseModel, exclude_unset: bool = False, **filter_by: dict
-    ) -> None:
+    async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by: dict) -> None:
         stmt = (
             update(self.model)
             .filter_by(**filter_by)
