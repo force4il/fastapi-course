@@ -27,7 +27,7 @@ class RoomsRepository(BaseRepository):
             RoomWithRelsDataMapper.map_to_domain_entity(model) for model in result.scalars().all()
         ]
 
-    async def get_one_or_none(self, **filter_by):
+    async def get_one_or_none_with_rels(self, **filter_by):
         query = (
             select(self.model).options(selectinload(self.model.facilities)).filter_by(**filter_by)
         )

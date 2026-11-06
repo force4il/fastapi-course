@@ -1,5 +1,6 @@
 import json
 from unittest import mock
+from typing import Any, AsyncGenerator
 
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
@@ -30,7 +31,7 @@ app.dependency_overrides[get_db] = get_db_null_pool
 
 
 @pytest.fixture
-async def db():
+async def db() -> AsyncGenerator[DBManager]:
     async for db in get_db_null_pool():
         yield db
 
@@ -56,7 +57,7 @@ async def setup_database(check_test_mode):
 
 
 @pytest.fixture(scope="session")
-async def ac():
+async def ac() -> AsyncGenerator:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 

@@ -5,7 +5,7 @@ import pytest
     "email, password, status_code_reg, status_code_log, correct_email",
     [
         ("first@gmail.com", "1234", 200, 200, True),
-        ("first@gmail.com", "5678", 403, 401, True),
+        ("first@gmail.com", "5678", 409, 401, True),
         ("test", "test", 422, 401, False),
         ("second@mail.com", "hello", 200, 200, True),
     ],

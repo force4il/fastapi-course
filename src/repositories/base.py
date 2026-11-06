@@ -1,7 +1,13 @@
+from typing import Any, Sequence
+
+from asyncpg.exceptions import UniqueViolationError
 import sqlalchemy
+from sqlalchemy.exc import IntegrityError
 from pydantic import BaseModel
 from sqlalchemy import insert, select, update
+from sqlalchemy.exc import NoResultFound
 
+from src.exceptions import ObjectNotFoundException, ObjectAlreadyExistsException, ForeignToAddNotFoundException
 from src.repositories.mappers.base import DataMapper
 
 
@@ -21,7 +27,7 @@ class BaseRepository:
     async def get_all(self, *args: tuple, **kwargs: dict) -> list:
         return await self.get_filtered()
 
-    async def get_one_or_none(self, **filter_by: dict):
+    async def get_one_or_none(self, **filter_by: dict) -> BaseModel | None | Any:
         query = select(self.model).filter_by(**filter_by)
         result = await self.session.execute(query)
         model = result.scalars().one_or_none()
@@ -30,24 +36,44 @@ class BaseRepository:
 
         return self.mapper.map_to_domain_entity(model)
 
+    async def get_one(self, **filter_by: dict) -> BaseModel:
+        query = select(self.model).filter_by(**filter_by)
+        result = await self.session.execute(query)
+        try:
+            model = result.scalar_one()
+        except NoResultFound:
+            raise ObjectNotFoundException
+        
+        return self.mapper.map_to_domain_entity(model)
+
+
     async def add(self, data: BaseModel):
-        stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-        result = await self.session.execute(stmt)
-        model = result.scalars().one()
+        try:
+            stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
+            result = await self.session.execute(stmt)
+            model = result.scalars().one()
+        except IntegrityError as ex:
+            if isinstance(ex.orig.__cause__, UniqueViolationError):
+                raise ObjectAlreadyExistsException from ex
+            
+            raise ex
 
         return self.mapper.map_to_domain_entity(model)
 
-    async def add_bulk(self, data: list[BaseModel]) -> None:
+    async def add_bulk(self, data: Sequence[BaseModel]) -> None:
         stmt = insert(self.model).values([item.model_dump() for item in data])
         await self.session.execute(stmt)
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by: dict) -> None:
-        stmt = (
-            update(self.model)
-            .filter_by(**filter_by)
-            .values(**data.model_dump(exclude_unset=exclude_unset))
-        )
-        await self.session.execute(stmt)
+        try:
+            stmt = (
+                update(self.model)
+                .filter_by(**filter_by)
+                .values(**data.model_dump(exclude_unset=exclude_unset))
+            )
+            await self.session.execute(stmt)
+        except IntegrityError:
+            raise ForeignToAddNotFoundException
 
     async def delete(self, **filter_by: dict) -> None:
         stmt = sqlalchemy.delete(self.model).filter_by(**filter_by)
