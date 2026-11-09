@@ -1,10 +1,11 @@
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
-
+import logging
 # import asyncio
 
 sys.path.append(str(Path(__file__).parent.parent))
+logging.basicConfig(level=logging.INFO)
 
 import uvicorn
 from fastapi import FastAPI
@@ -38,6 +39,7 @@ async def lifespan(app: FastAPI):
     await redis_manager.connect()
 
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
+    logging.info("FastAPICache initialized")
     yield
     await redis_manager.close()
 

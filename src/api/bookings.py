@@ -24,13 +24,13 @@ async def add_booking(db: DBDep, booking_data: BookingRequest, user_id: UserIdDe
         room: Room = await db.rooms.get_one(id=booking_data.room_id)
     except ObjectNotFoundException:
         raise HTTPException(status_code=400, detail="Номер не найден")
-    
+
     booking_add_data = BookingAdd(**booking_data.model_dump(), user_id=user_id, price=room.price)
     try:
         booking = await db.bookings.add_booking(booking_add_data, hotel_id=room.hotel_id)
     except AllRoomsAreBookedException as err:
         raise HTTPException(status_code=409, detail=err.detail)
-    
+
     await db.commit()
 
     return {"status": "OK", "data": booking}

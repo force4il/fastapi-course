@@ -1,4 +1,5 @@
 from typing import Any, Sequence
+import logging
 
 from asyncpg.exceptions import UniqueViolationError
 import sqlalchemy
@@ -7,7 +8,11 @@ from pydantic import BaseModel
 from sqlalchemy import insert, select, update
 from sqlalchemy.exc import NoResultFound
 
-from src.exceptions import ObjectNotFoundException, ObjectAlreadyExistsException, ForeignToAddNotFoundException
+from src.exceptions import (
+    ObjectNotFoundException,
+    ObjectAlreadyExistsException,
+    ForeignToAddNotFoundException,
+)
 from src.repositories.mappers.base import DataMapper
 
 
@@ -43,9 +48,8 @@ class BaseRepository:
             model = result.scalar_one()
         except NoResultFound:
             raise ObjectNotFoundException
-        
-        return self.mapper.map_to_domain_entity(model)
 
+        return self.mapper.map_to_domain_entity(model)
 
     async def add(self, data: BaseModel):
         try:
@@ -53,9 +57,13 @@ class BaseRepository:
             result = await self.session.execute(stmt)
             model = result.scalars().one()
         except IntegrityError as ex:
+            logging.error(
+                f"Не удалось добавить данные в бд, {data=}, тип ошибки: {type(ex.orig.__cause__)=}"
+            )
             if isinstance(ex.orig.__cause__, UniqueViolationError):
                 raise ObjectAlreadyExistsException from ex
-            
+
+            logging.error(f"Незнакомая ошибка, тип ошибки: {type(ex.orig.__cause__)=}")
             raise ex
 
         return self.mapper.map_to_domain_entity(model)

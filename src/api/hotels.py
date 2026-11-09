@@ -3,7 +3,11 @@ from datetime import date
 from fastapi import APIRouter, Body, Query
 from fastapi_cache.decorator import cache
 
-from src.exceptions import ObjectNotFoundException, check_date_to_after_date_from, HotelNotFoundHTTPException
+from src.exceptions import (
+    ObjectNotFoundException,
+    check_date_to_after_date_from,
+    HotelNotFoundHTTPException,
+)
 from src.api.dependecies import DBDep, PaginationDep, PaginationId
 from src.schemas.hotels import HotelAdd, HotelPatch
 
@@ -43,6 +47,7 @@ async def get_hotel(db: DBDep, hotel_id: PaginationId):
         return await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
+
 
 @router.post("", summary="добавление отеля")
 async def create_hotel(

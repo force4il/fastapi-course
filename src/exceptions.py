@@ -21,7 +21,7 @@ class AllRoomsAreBookedException(NabronirovalException):
 class ForeignToAddNotFoundException(NabronirovalException):
     detail = "Объект для связки не найден"
 
-    
+
 class ObjectAlreadyExistsException(NabronirovalException):
     detail = "Объект уже существует"
 
@@ -41,9 +41,9 @@ class NabronirovalHTTPException(HTTPException):
 
 class HotelNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
-    detail = "Отель не найден" 
+    detail = "Отель не найден"
 
 
 class RoomNotFoundHTTPException(NabronirovalHTTPException):
     status_code = 404
-    detail = "Номер не найден" 
+    detail = "Номер не найден"

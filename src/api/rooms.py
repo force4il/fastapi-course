@@ -2,7 +2,12 @@ from datetime import date
 
 from fastapi import APIRouter, Body, HTTPException, Query
 
-from src.exceptions import ObjectNotFoundException, check_date_to_after_date_from, HotelNotFoundHTTPException, RoomNotFoundHTTPException
+from src.exceptions import (
+    ObjectNotFoundException,
+    check_date_to_after_date_from,
+    HotelNotFoundHTTPException,
+    RoomNotFoundHTTPException,
+)
 from src.api.dependecies import DBDep, PaginationId
 from src.schemas.facilities import RoomFacilityAdd
 from src.schemas.rooms import BaseRoom, RoomAdd, RoomPatch, RoomPatchRequest
@@ -28,8 +33,9 @@ async def get_room(db: DBDep, hotel_id: PaginationId, room_id: PaginationId):
     room = await db.rooms.get_one_or_none_with_rels(id=room_id, hotel_id=hotel_id)
     if not room:
         raise RoomNotFoundHTTPException
-    
+
     return room
+
 
 @router.post("/{hotel_id}/rooms", summary="Добавление номера для отеля")
 async def create_room(
@@ -59,7 +65,7 @@ async def create_room(
             },
         }
     ),
-) -> dict:  
+) -> dict:
     try:
         await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
@@ -85,7 +91,7 @@ async def edit_room(
         await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
-    
+
     await get_room(db, hotel_id=hotel_id, room_id=room_id)
 
     room_edit_data = RoomAdd(hotel_id=hotel_id, **room_data.model_dump())
@@ -107,7 +113,7 @@ async def part_edit_room(
         await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
-    
+
     await get_room(db, hotel_id=hotel_id, room_id=room_id)
 
     room_patch_dict = room_data.model_dump(exclude_unset=True)
@@ -126,7 +132,7 @@ async def delete_room(db: DBDep, hotel_id: PaginationId, room_id: PaginationId) 
         await db.hotels.get_one(id=hotel_id)
     except ObjectNotFoundException:
         raise HotelNotFoundHTTPException
-    
+
     await get_room(db, hotel_id=hotel_id, room_id=room_id)
 
     await db.rooms.delete(id=room_id, hotel_id=hotel_id)
