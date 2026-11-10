@@ -1,11 +1,12 @@
 import json
 from unittest import mock
-from typing import Any, AsyncGenerator
+from typing import AsyncGenerator
 
 mock.patch("fastapi_cache.decorator.cache", lambda *args, **kwargs: lambda f: f).start()
 
 import pytest
 from httpx import ASGITransport, AsyncClient
+from contextlib import asynccontextmanager
 
 from src.api.dependecies import get_db
 from src.config import settings
@@ -30,8 +31,26 @@ async def get_db_null_pool():
 app.dependency_overrides[get_db] = get_db_null_pool
 
 
+def get_json_user_data() -> dict:
+    return {
+        "email": "test@test.com",
+        "password": "1234",
+        "first_name": "test",
+        "last_name": "test",
+    }
+
+
+@asynccontextmanager
+async def make_client():
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        yield client
+
+
 @pytest.fixture
-async def db() -> AsyncGenerator[DBManager]:
+async def db() -> AsyncGenerator:
     async for db in get_db_null_pool():
         yield db
 
@@ -58,34 +77,26 @@ async def setup_database(check_test_mode):
 
 @pytest.fixture(scope="session")
 async def ac() -> AsyncGenerator:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac
+    async with make_client() as client:
+        yield client
 
 
 @pytest.fixture(scope="session", autouse=True)
 async def register_user(setup_database, ac):
-    await ac.post(
+    response = await ac.post(
         url="/auth/register",
-        json={
-            "email": "test@test.com",
-            "password": "1234",
-            "first_name": "test",
-            "last_name": "test",
-        },
+        json=get_json_user_data(),
     )
+    assert response.status_code == 200
 
 
 @pytest.fixture(scope="session", autouse=True)
-async def auth_ac(ac, register_user):
-    response = await ac.post(
-        url="/auth/login",
-        json={
-            "email": "test@test.com",
-            "password": "1234",
-            "first_name": "test",
-            "last_name": "test",
-        },
-    )
-
-    assert response.cookies["access_token"]
-    yield ac
+async def auth_ac(register_user) -> AsyncGenerator:
+    async with make_client() as client:
+        response = await client.post(
+            url="/auth/login",
+            json=get_json_user_data(),
+        )
+        assert response.status_code == 200
+        assert response.cookies["access_token"]
+        yield client

@@ -16,7 +16,7 @@ async def test_api_auth(
     status_code_reg: int,
     status_code_log: int,
     correct_email: bool,
-    ac,
+    ac
 ):
     ac.cookies.clear()
     ac.headers.pop("Authorization", None)
