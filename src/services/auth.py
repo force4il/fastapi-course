@@ -4,10 +4,11 @@ import jwt
 from fastapi import HTTPException
 from passlib.context import CryptContext
 
+from services.base import BaseService
 from src.config import settings
 
 
-class AuthService:
+class AuthService(BaseService):
     pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

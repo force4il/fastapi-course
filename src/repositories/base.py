@@ -11,7 +11,6 @@ from sqlalchemy.exc import NoResultFound
 from src.exceptions import (
     ObjectNotFoundException,
     ObjectAlreadyExistsException,
-    ForeignToAddNotFoundException,
 )
 from src.repositories.mappers.base import DataMapper
 
@@ -73,16 +72,19 @@ class BaseRepository:
         await self.session.execute(stmt)
 
     async def edit(self, data: BaseModel, exclude_unset: bool = False, **filter_by: dict) -> None:
-        try:
-            stmt = (
-                update(self.model)
-                .filter_by(**filter_by)
-                .values(**data.model_dump(exclude_unset=exclude_unset))
-            )
-            await self.session.execute(stmt)
-        except IntegrityError:
-            raise ForeignToAddNotFoundException
+        stmt = (
+            update(self.model)
+            .filter_by(**filter_by)
+            .values(**data.model_dump(exclude_unset=exclude_unset))
+        ).returning(self.model.id)
+        await self.check_object_not_found(stmt)
 
     async def delete(self, **filter_by: dict) -> None:
-        stmt = sqlalchemy.delete(self.model).filter_by(**filter_by)
+        stmt = sqlalchemy.delete(self.model).filter_by(**filter_by).returning(self.model.id)
+        await self.check_object_not_found(stmt)
+
         await self.session.execute(stmt)
+
+    async def check_object_not_found(self, stmt) -> None:
+        if (await self.session.execute(stmt)).first() is None:
+            raise ObjectNotFoundException

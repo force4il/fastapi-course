@@ -18,12 +18,16 @@ class AllRoomsAreBookedException(NabronirovalException):
     detail = "Все номера уже забронированы"
 
 
-class ForeignToAddNotFoundException(NabronirovalException):
-    detail = "Объект для связки не найден"
-
-
 class ObjectAlreadyExistsException(NabronirovalException):
     detail = "Объект уже существует"
+
+
+class RoomNotFoundException(ObjectNotFoundException):
+    detail = "Такого номера не существует"
+
+
+class HotelNotFoundException(ObjectNotFoundException):
+    detail = "Такого отеля не существует"
 
 
 def check_date_to_after_date_from(date_to: date, date_from: date):

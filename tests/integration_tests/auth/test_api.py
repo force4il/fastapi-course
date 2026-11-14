@@ -11,12 +11,7 @@ import pytest
     ],
 )
 async def test_api_auth(
-    email: str,
-    password: str,
-    status_code_reg: int,
-    status_code_log: int,
-    correct_email: bool,
-    ac
+    email: str, password: str, status_code_reg: int, status_code_log: int, correct_email: bool, ac
 ):
     ac.cookies.clear()
     ac.headers.pop("Authorization", None)

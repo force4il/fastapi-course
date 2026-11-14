@@ -32,12 +32,12 @@ async def test_bookings_crud(db):
         price=updated_price,
     )
     await db.bookings.edit(update_booking_data, id=booking.id)
-    booking = await db.bookings.get_one_or_none(id=booking.id)
-    assert booking
-    assert booking.id == add_booking.id
-    assert booking.date_from == updated_date_from
-    assert booking.date_to == updated_date_to
-    assert booking.price == updated_price
+    update_booking = await db.bookings.get_one_or_none(id=booking.id)
+    assert update_booking
+    assert update_booking.id == add_booking.id
+    assert update_booking.date_from == updated_date_from
+    assert update_booking.date_to == updated_date_to
+    assert update_booking.price == updated_price
 
     await db.bookings.delete(id=booking.id)
     booking_after_delete = await db.bookings.get_one_or_none(id=booking.id)
